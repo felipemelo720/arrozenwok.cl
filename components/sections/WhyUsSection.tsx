@@ -1,4 +1,4 @@
-import { Flame, Leaf, Zap, HeartHandshake } from "lucide-react"
+import { Flame, Leaf, Zap, HeartHandshake } from "@/components/Icons"
 import RevealWrapper from "@/components/RevealWrapper"
 
 const reasons = [

@@ -67,8 +67,9 @@ export default function Navbar() {
           <StoreStatusBar />
           {/* Desktop only CTA */}
           <button
+            data-theme="dark"
             onClick={() => handleNavClick("#menu")}
-            className="hidden md:block bg-primary hover:bg-primary-dark text-white text-sm font-bold px-5 py-2.5 rounded-full transition-colors duration-200"
+            className="hidden md:block bg-primary hover:bg-primary-dark text-pure-white text-sm font-bold px-5 py-2.5 rounded-full transition-colors duration-200"
           >
             Pedir Ahora →
           </button>
@@ -99,8 +100,9 @@ export default function Navbar() {
             </button>
           ))}
           <button
+            data-theme="dark"
             onClick={() => handleNavClick("#menu")}
-            className="w-full mt-3 mb-1 bg-primary hover:bg-primary-dark text-white font-bold text-sm py-3.5 rounded-xl transition-colors"
+            className="w-full mt-3 mb-1 bg-primary hover:bg-primary-dark text-pure-white font-bold text-sm py-3.5 rounded-xl transition-colors"
             style={{ fontFamily: "var(--font-inter)" }}
           >
             Pedir Ahora →

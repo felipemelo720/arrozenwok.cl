@@ -1,4 +1,4 @@
-import { MessageCircle, Clock, MapPin } from "lucide-react"
+import { MessageCircle, Clock, MapPin } from "@/components/Icons"
 
 function IgIcon() {
   return (
@@ -15,7 +15,7 @@ const IG = "https://www.instagram.com/arrozenwok"
 
 export default function Footer() {
   return (
-    <footer className="bg-black border-t border-white/5 py-12 px-4 sm:px-6">
+    <footer className="bg-surface border-t border-white/5 py-12 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pb-10 border-b border-white/8">
           {/* Brand */}

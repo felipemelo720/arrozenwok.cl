@@ -2,7 +2,6 @@
 
 import { cookies } from "next/headers"
 import { supabaseServer } from "@/lib/supabase-server"
-import { sendWhatsAppMessage } from "@/lib/whatsapp"
 import { revalidatePath } from "next/cache"
 
 const COOKIE = "admin_session"
@@ -32,27 +31,13 @@ export async function trackEventServer(type: string, metadata: Record<string, un
   } catch { /* silent */ }
 }
 
-export async function toggleStore(isOpen: boolean, formData: FormData) {
-  const sendNotification = formData.get("sendNotification") === "on"
-
+export async function toggleStore(isOpen: boolean) {
   await supabaseServer
     .from("store_status")
     .upsert({ id: 1, is_open: isOpen, updated_at: new Date().toISOString() })
 
-  if (isOpen && sendNotification) {
-    const msg = "¡Arroz en Wok está abierto! 🍜\nHaz tu pedido ahora. Cerramos a las 21:30 hrs.\nhttps://wa.me/56931358884"
-    try {
-      await Promise.all([
-        sendPush("¡Arroz en Wok está abierto! 🍜", "Haz tu pedido ahora. Cerramos a las 21:30 hrs."),
-        sendWhatsAppBroadcast(msg),
-      ])
-    } catch { /* notificaciones fallaron, pero la tienda igual abre */ }
-    try { await trackEventServer("store_opened_with_notification") } catch { /* silent */ }
-  } else if (isOpen) {
-    try { await trackEventServer("store_opened_silent") } catch { /* silent */ }
-  }
-
   revalidatePath("/admin")
+  revalidatePath("/")
 }
 
 export async function toggleDelivery(enabled: boolean) {
@@ -60,59 +45,50 @@ export async function toggleDelivery(enabled: boolean) {
     .from("store_status")
     .upsert({ id: 1, delivery_enabled: enabled, updated_at: new Date().toISOString() })
   revalidatePath("/admin")
+  revalidatePath("/")
 }
 
-export async function sendPush(title: string, body: string) {
-  const jar = await cookies()
-  const token = jar.get(COOKIE)?.value
+export async function setItemAvailability(itemName: string, available: boolean) {
+  const sel = await supabaseServer
+    .from("store_status")
+    .select("unavailable_items")
+    .eq("id", 1)
+    .single()
 
-  const { count } = await supabaseServer
-    .from("push_subscriptions")
-    .select("*", { count: "exact", head: true })
+  if (sel.error) {
+    console.error("[setItemAvailability] select failed:", sel.error)
+    throw new Error(`No se pudo leer disponibilidad: ${sel.error.message}`)
+  }
 
-  await fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/api/push/send`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: `${COOKIE}=${token}`,
-    },
-    body: JSON.stringify({ title, body }),
-  })
+  const current: string[] = (sel.data as { unavailable_items?: string[] } | null)?.unavailable_items ?? []
+  const updated = available
+    ? current.filter((n) => n !== itemName)
+    : [...new Set([...current, itemName])]
 
-  await trackEventServer("push_sent", { title, recipients: count ?? 0 })
-}
+  const up = await supabaseServer
+    .from("store_status")
+    .upsert({ id: 1, unavailable_items: updated, updated_at: new Date().toISOString() })
 
-export async function sendWhatsAppBroadcast(text: string) {
-  const { data: subscribers } = await supabaseServer
-    .from("whatsapp_subscribers")
-    .select("phone")
+  if (up.error) {
+    console.error("[setItemAvailability] upsert failed:", up.error)
+    throw new Error(`No se pudo guardar disponibilidad: ${up.error.message}`)
+  }
 
-  if (!subscribers?.length) return
-
-  await Promise.allSettled(
-    subscribers.map((s) => sendWhatsAppMessage(s.phone, text))
-  )
-
-  await trackEventServer("wa_broadcast_sent", { recipients: subscribers.length })
+  revalidatePath("/admin")
+  revalidatePath("/")
 }
 
 export async function getAdminData() {
-  const [statusRes, pushCountRes, waCountRes] = await Promise.all([
-    supabaseServer.from("store_status").select("is_open, delivery_enabled").eq("id", 1).single(),
-    supabaseServer.from("push_subscriptions").select("*", { count: "exact", head: true }),
-    supabaseServer.from("whatsapp_subscribers").select("*", { count: "exact", head: true }),
-  ])
-
-  // If delivery_enabled column doesn't exist yet, fall back to is_open-only query
-  const statusData = statusRes.error
-    ? (await supabaseServer.from("store_status").select("is_open").eq("id", 1).single()).data
-    : statusRes.data
+  const { data } = await supabaseServer
+    .from("store_status")
+    .select("is_open, delivery_enabled, unavailable_items")
+    .eq("id", 1)
+    .single()
 
   return {
-    isOpen: statusData?.is_open ?? false,
-    deliveryEnabled: (statusData as { delivery_enabled?: boolean } | null)?.delivery_enabled ?? true,
-    subscriberCount: pushCountRes.count ?? 0,
-    waSubscriberCount: waCountRes.count ?? 0,
+    isOpen: data?.is_open ?? false,
+    deliveryEnabled: (data as { delivery_enabled?: boolean } | null)?.delivery_enabled ?? true,
+    unavailableItems: (data as { unavailable_items?: string[] } | null)?.unavailable_items ?? [],
   }
 }
 
@@ -129,9 +105,6 @@ export type StatsData = {
     page_visit: number
     order_sent: number
     cart_abandoned: number
-    push_sent: number
-    wa_broadcast_sent: number
-    wa_order_received: number
   }
 }
 
@@ -171,9 +144,6 @@ export async function getStats(): Promise<StatsData> {
       page_visit: count("page_visit"),
       order_sent: count("order_sent"),
       cart_abandoned: count("cart_abandoned"),
-      push_sent: count("push_sent"),
-      wa_broadcast_sent: count("wa_broadcast_sent"),
-      wa_order_received: count("wa_order_received"),
     },
   }
 }

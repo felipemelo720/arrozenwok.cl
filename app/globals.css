@@ -7,11 +7,28 @@
   --color-surface: #131313;
   --color-card: #1A1A1A;
   --color-accent: #F59E0B;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* Stable colors for components that shouldn't flip */
+  --color-pure-white: #ffffff;
+  --color-pure-black: #000000;
+}
+
+/* ── Dark theme (reset for nested dark cards) ── */
+[data-theme="dark"] {
+  --color-bg: #0A0A0A;
+  --color-surface: #131313;
+  --color-card: #1A1A1A;
+  --color-accent: #F59E0B;
+  --color-white: #ffffff;
+  --color-black: #000000;
 }
 
 body {
-  background-color: #0A0A0A;
-  color: #F5F5F5;
+  background-color: var(--color-bg);
+  color: var(--color-white);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .font-heading {

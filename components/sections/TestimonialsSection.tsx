@@ -1,4 +1,4 @@
-import { Star } from "lucide-react"
+import { Star } from "@/components/Icons"
 import RevealWrapper from "@/components/RevealWrapper"
 
 const reviews = [

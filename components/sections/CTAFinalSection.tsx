@@ -14,7 +14,7 @@ const IG = "https://www.instagram.com/arrozenwok"
 
 export default function CTAFinalSection() {
   return (
-    <section className="relative overflow-hidden py-28 px-4 sm:px-6" style={{ background: "#0E0404" }}>
+    <section className="relative overflow-hidden py-28 px-4 sm:px-6 bg-bg" data-theme="dark">
       {/* Big red glow bg */}
       <div className="absolute inset-0 pointer-events-none">
         <div

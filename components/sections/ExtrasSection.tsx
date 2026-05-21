@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, Check } from "lucide-react"
+import { Plus, Check } from "@/components/Icons"
 import { useState } from "react"
 import RevealWrapper from "@/components/RevealWrapper"
 import { useCart } from "@/context/CartContext"
@@ -16,6 +16,13 @@ const extras = [
     price: "$3.500",
     gradient: "linear-gradient(135deg, #2A1A08 0%, #140D00 100%)",
     emoji: "🥟",
+  },
+  {
+    name: "Empanadas Pollo Mandarín",
+    desc: "5 unidades — pollo en salsa mandarín",
+    price: "$4.500",
+    gradient: "linear-gradient(135deg, #2A1508 0%, #140A00 100%)",
+    emoji: "🫔",
   },
   {
     name: "Papas Fritas",
@@ -42,7 +49,7 @@ function ExtraAddButton({ item }: { item: typeof extras[number] }) {
       className={`inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full border transition-all duration-200 ${
         added
           ? "bg-green-500/20 border-green-500/50 text-green-400"
-          : "bg-white/8 hover:bg-primary text-white/50 hover:text-white border-white/15 hover:border-primary"
+          : "bg-white/8 hover:bg-primary text-white/50 hover:text-pure-white border-white/15 hover:border-primary"
       }`}
       style={{ fontFamily: "var(--font-inter)" }}
     >

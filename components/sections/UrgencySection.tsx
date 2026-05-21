@@ -1,5 +1,5 @@
 import React from "react"
-import { MessageCircle, AlertCircle } from "lucide-react"
+import { MessageCircle, AlertCircle } from "@/components/Icons"
 import RevealWrapper from "@/components/RevealWrapper"
 
 const WA = "https://wa.me/56931358884?text=Hola%2C%20quiero%20hacer%20un%20pedido%20%F0%9F%8D%9C"
@@ -83,7 +83,7 @@ export default function UrgencySection() {
             href={WA}
             target="_blank"
             rel="noopener noreferrer"
-            className="animate-glow inline-flex items-center gap-3 bg-primary hover:bg-primary-dark text-white font-bold text-lg px-10 py-4 rounded-full transition-colors duration-200"
+            className="animate-glow inline-flex items-center gap-3 bg-primary hover:bg-primary-dark text-pure-white font-bold text-lg px-10 py-4 rounded-full transition-colors duration-200"
           >
             <MessageCircle size={20} />
             Asegurar mi Box Ahora

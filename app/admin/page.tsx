@@ -1,6 +1,8 @@
 import { cookies } from "next/headers"
-import { login, logout, toggleStore, toggleDelivery, sendPush, getAdminData, getStats } from "./actions"
+import Link from "next/link"
+import { login, logout, toggleStore, toggleDelivery, getAdminData, getStats, setItemAvailability } from "./actions"
 import StatsChart from "./StatsChart"
+import { riceBox, chaumin } from "@/lib/menu-data"
 
 export default async function AdminPage() {
   const jar = await cookies()
@@ -25,7 +27,7 @@ export default async function AdminPage() {
             />
             <button
               type="submit"
-              className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 rounded-xl transition-colors"
+              className="w-full bg-primary hover:bg-primary-dark text-pure-white font-bold py-3 rounded-xl transition-colors"
               style={{ fontFamily: "var(--font-inter)" }}
             >
               Entrar
@@ -36,7 +38,7 @@ export default async function AdminPage() {
     )
   }
 
-  const [{ isOpen, deliveryEnabled, subscriberCount, waSubscriberCount }, stats] = await Promise.all([
+  const [{ isOpen, deliveryEnabled, unavailableItems }, stats] = await Promise.all([
     getAdminData(),
     getStats(),
   ])
@@ -54,20 +56,20 @@ export default async function AdminPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <a
+            <Link
               href="/"
-              className="text-white/40 hover:text-white text-sm border border-white/10 hover:border-white/30 px-4 py-2 rounded-full transition-colors"
+              className="text-white/40 hover:text-white text-xs sm:text-sm border border-white/10 hover:border-white/30 px-3 sm:px-4 py-2 rounded-full transition-colors"
               style={{ fontFamily: "var(--font-inter)" }}
             >
               ← Home
-            </a>
+            </Link>
             <form action={logout}>
               <button
                 type="submit"
-                className="text-white/40 hover:text-white text-sm border border-white/10 hover:border-white/30 px-4 py-2 rounded-full transition-colors"
+                className="text-white/40 hover:text-white text-xs sm:text-sm border border-white/10 hover:border-white/30 px-3 sm:px-4 py-2 rounded-full transition-colors"
                 style={{ fontFamily: "var(--font-inter)" }}
               >
-                Cerrar sesión
+                Salir
               </button>
             </form>
           </div>
@@ -75,42 +77,24 @@ export default async function AdminPage() {
 
         {/* Store status */}
         <div className="bg-surface border border-white/10 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white/40 text-xs uppercase tracking-widest mb-1" style={{ fontFamily: "var(--font-inter)" }}>
-                Estado del negocio
-              </p>
-              <div className="flex items-center gap-2">
-                <div className={`w-2.5 h-2.5 rounded-full ${isOpen ? "bg-green-400" : "bg-red-500"}`} />
-                <span className="font-heading text-2xl text-white">
-                  {isOpen ? "ABIERTO" : "CERRADO"}
-                </span>
-              </div>
-            </div>
-            <div className="text-white/30 text-xs text-right space-y-1" style={{ fontFamily: "var(--font-inter)" }}>
-              <p>{subscriberCount} push · {waSubscriberCount} WA</p>
-              <p>recibirán notificación</p>
+          <div>
+            <p className="text-white/40 text-xs uppercase tracking-widest mb-1" style={{ fontFamily: "var(--font-inter)" }}>
+              Estado del negocio
+            </p>
+            <div className="flex items-center gap-2">
+              <div className={`w-2.5 h-2.5 rounded-full ${isOpen ? "bg-green-400" : "bg-red-500"}`} />
+              <span className="font-heading text-2xl text-white">
+                {isOpen ? "ABIERTO" : "CERRADO"}
+              </span>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            {/* Abrir: checkbox inside form for sendNotification */}
-            <form action={toggleStore.bind(null, true)} className="space-y-2">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  name="sendNotification"
-                  defaultChecked
-                  className="accent-green-400 w-4 h-4"
-                />
-                <span className="text-white/50 text-xs" style={{ fontFamily: "var(--font-inter)" }}>
-                  Enviar notificación
-                </span>
-              </label>
+            <form action={toggleStore.bind(null, true)}>
               <button
                 type="submit"
                 disabled={isOpen}
-                className="w-full bg-green-500/20 hover:bg-green-500/30 disabled:opacity-40 disabled:cursor-not-allowed border border-green-500/40 text-green-400 font-bold py-3 rounded-xl transition-colors text-sm"
+                className="w-full h-full bg-green-500/20 hover:bg-green-500/30 disabled:opacity-40 disabled:cursor-not-allowed border border-green-500/40 text-green-400 font-bold py-3 rounded-xl transition-colors text-sm"
                 style={{ fontFamily: "var(--font-inter)" }}
               >
                 Abrir negocio
@@ -169,45 +153,52 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        {/* Custom notification */}
+        {/* Menu availability */}
         <div className="bg-surface border border-white/10 rounded-2xl p-6 space-y-4">
           <p className="text-white/40 text-xs uppercase tracking-widest" style={{ fontFamily: "var(--font-inter)" }}>
-            Enviar notificación manual
+            Disponibilidad del menú
           </p>
-          <form
-            action={async (fd: FormData) => {
-              "use server"
-              const title = fd.get("title") as string
-              const body = fd.get("body") as string
-              if (title) await sendPush(title, body)
-            }}
-            className="space-y-3"
-          >
-            <input
-              name="title"
-              type="text"
-              placeholder="Título"
-              required
-              defaultValue="¡Arroz en Wok!"
-              className="w-full bg-card border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition-colors"
-              style={{ fontFamily: "var(--font-inter)" }}
-            />
-            <input
-              name="body"
-              type="text"
-              placeholder="Mensaje"
-              defaultValue="Ya estamos abiertos. Haz tu pedido ahora 🍜"
-              className="w-full bg-card border border-white/10 text-white placeholder-white/30 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary transition-colors"
-              style={{ fontFamily: "var(--font-inter)" }}
-            />
-            <button
-              type="submit"
-              className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 rounded-xl transition-colors text-sm"
-              style={{ fontFamily: "var(--font-inter)" }}
-            >
-              Enviar notificación
-            </button>
-          </form>
+
+          {[
+            { label: "Rice & Chip Box", items: riceBox },
+            { label: "Chaumin Box",     items: chaumin },
+          ].map(({ label, items }) => (
+            <div key={label} className="space-y-2">
+              <p className="text-white/25 text-[10px] uppercase tracking-widest" style={{ fontFamily: "var(--font-inter)" }}>
+                {label}
+              </p>
+              <div className="space-y-1.5">
+                {items.map((item) => {
+                  const isUnavailable = unavailableItems.includes(item.name)
+                  return (
+                    <form
+                      key={item.name}
+                      action={setItemAvailability.bind(null, item.name, isUnavailable)}
+                      className="flex items-center justify-between gap-3 py-2 px-3 rounded-xl bg-card border border-white/5"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className={`w-2 h-2 rounded-full shrink-0 ${isUnavailable ? "bg-red-500" : "bg-green-400"}`} />
+                        <span className="text-white/70 text-sm truncate" style={{ fontFamily: "var(--font-inter)" }}>
+                          {item.name}
+                        </span>
+                      </div>
+                      <button
+                        type="submit"
+                        className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-lg border transition-colors ${
+                          isUnavailable
+                            ? "bg-green-500/10 hover:bg-green-500/20 border-green-500/30 text-green-400"
+                            : "bg-red-500/10 hover:bg-red-500/20 border-red-500/30 text-red-400"
+                        }`}
+                        style={{ fontFamily: "var(--font-inter)" }}
+                      >
+                        {isUnavailable ? "Activar" : "Agotar"}
+                      </button>
+                    </form>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Stats */}
@@ -219,22 +210,9 @@ export default async function AdminPage() {
           {/* Counter cards */}
           <div className="grid grid-cols-3 gap-3">
             {[
-              { label: "Visitas",    value: stats.totals.page_visit,       color: "text-blue-400" },
-              { label: "Pedidos WA", value: stats.totals.wa_order_received, color: "text-green-400" },
-              { label: "Abandonos",  value: stats.totals.cart_abandoned,    color: "text-orange-400" },
-            ].map(({ label, value, color }) => (
-              <div key={label} className="bg-card border border-white/8 rounded-xl p-3 text-center">
-                <p className={`font-heading text-3xl ${color}`}>{value}</p>
-                <p className="text-white/40 text-[10px] mt-0.5" style={{ fontFamily: "var(--font-inter)" }}>{label}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { label: "Push enviados", value: stats.totals.push_sent,          color: "text-purple-400" },
-              { label: "WA enviados",   value: stats.totals.wa_broadcast_sent,   color: "text-yellow-400" },
-              { label: "Pedidos web",   value: stats.totals.order_sent,          color: "text-primary" },
+              { label: "Visitas",     value: stats.totals.page_visit,     color: "text-blue-400" },
+              { label: "Pedidos web", value: stats.totals.order_sent,     color: "text-primary" },
+              { label: "Abandonos",   value: stats.totals.cart_abandoned, color: "text-orange-400" },
             ].map(({ label, value, color }) => (
               <div key={label} className="bg-card border border-white/8 rounded-xl p-3 text-center">
                 <p className={`font-heading text-3xl ${color}`}>{value}</p>

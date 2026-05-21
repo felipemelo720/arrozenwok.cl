@@ -1,8 +1,5 @@
-import { UtensilsCrossed, ChevronDown, MapPin, Clock, Star } from "lucide-react"
+import { UtensilsCrossed, ChevronDown, MapPin, Clock, Star } from "@/components/Icons"
 import Image from "next/image"
-import WhatsAppNotifyButton from "@/components/WhatsAppNotifyButton"
-
-const WA = "https://wa.me/56931358884?text=Hola%2C%20quiero%20hacer%20un%20pedido%20%F0%9F%8D%9C"
 
 const pills = [
   { icon: <MapPin size={14} />, text: "Delivery en Paine" },
@@ -91,14 +88,15 @@ export default function Hero() {
             {/* Primary row */}
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <a
+                data-theme="dark"
                 href="#menu"
-                className="animate-glow group relative inline-flex items-center gap-3 bg-primary text-white font-bold text-base px-7 py-4 rounded-2xl transition-all duration-200 w-full sm:w-auto justify-center overflow-hidden shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-[1.02] active:scale-[0.98]"
+                className="animate-glow group relative inline-flex items-center gap-3 bg-primary text-pure-white font-bold text-base px-7 py-4 rounded-2xl transition-all duration-200 w-full sm:w-auto justify-center overflow-hidden shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:scale-[1.02] active:scale-[0.98]"
                 style={{ fontFamily: "var(--font-inter)" }}
               >
                 <span className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <UtensilsCrossed size={20} />
                 <span>Armar mi Pedido</span>
-                <span className="text-white/60 font-normal text-sm">· desde $7.000</span>
+                <span className="text-pure-white/60 font-normal text-sm">· desde $7.000</span>
               </a>
               <a
                 href="#como-pedir"
@@ -109,8 +107,6 @@ export default function Hero() {
                 <ChevronDown size={16} className="opacity-60" />
               </a>
             </div>
-            {/* Notify row — only visible when closed */}
-            <WhatsAppNotifyButton />
           </div>
 
           {/* Location + hours pills */}
@@ -129,7 +125,7 @@ export default function Hero() {
 
         {/* RIGHT — food photo */}
         <div className="flex items-center justify-center">
-          <div className="relative w-full max-w-[440px]">
+          <div className="relative w-full max-w-[440px]" data-theme="dark">
             {/* Glow behind image */}
             <div
               className="absolute inset-0 rounded-3xl blur-3xl scale-90 opacity-70"

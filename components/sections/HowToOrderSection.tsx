@@ -1,4 +1,4 @@
-import { ShoppingCart, CheckCircle, Package } from "lucide-react"
+import { ShoppingCart, CheckCircle, Package } from "@/components/Icons"
 import RevealWrapper from "@/components/RevealWrapper"
 
 const steps = [
@@ -65,7 +65,7 @@ export default function HowToOrderSection() {
         <RevealWrapper delay={4} className="text-center mt-14">
           <a
             href="#menu"
-            className="inline-flex items-center gap-3 bg-primary hover:bg-primary-dark text-white font-bold text-lg px-9 py-4 rounded-full transition-colors duration-200 animate-glow"
+            className="inline-flex items-center gap-3 bg-primary hover:bg-primary-dark text-pure-white font-bold text-lg px-9 py-4 rounded-full transition-colors duration-200 animate-glow"
           >
             <ShoppingCart size={20} />
             Armar mi Pedido

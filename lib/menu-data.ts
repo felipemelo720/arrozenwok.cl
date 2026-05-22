@@ -112,3 +112,35 @@ export const chaumin: MenuItem[] = [
 ]
 
 export const allMenuItems = [...riceBox, ...chaumin]
+
+export interface ExtraItem {
+  name: string
+  desc: string
+  price: string
+  gradient: string
+  emoji: string
+}
+
+export const extras: ExtraItem[] = [
+  {
+    name: "Arrollados Primavera",
+    desc: "5 unidades crujientes — el acompañamiento perfecto",
+    price: "$3.500",
+    gradient: "linear-gradient(135deg, #2A1A08 0%, #140D00 100%)",
+    emoji: "🥟",
+  },
+  {
+    name: "Empanadas Pollo Mandarín",
+    desc: "5 unidades — pollo en salsa mandarín",
+    price: "$4.500",
+    gradient: "linear-gradient(135deg, #2A1508 0%, #140A00 100%)",
+    emoji: "🫔",
+  },
+  {
+    name: "Papas Fritas",
+    desc: "Porción generosa, doradas y crujientes",
+    price: "$4.000",
+    gradient: "linear-gradient(135deg, #2A2008 0%, #141000 100%)",
+    emoji: "🍟",
+  },
+]

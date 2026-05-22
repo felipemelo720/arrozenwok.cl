@@ -2,7 +2,7 @@ import { cookies } from "next/headers"
 import Link from "next/link"
 import { login, logout, toggleStore, toggleDelivery, getAdminData, getStats, setItemAvailability } from "./actions"
 import StatsChart from "./StatsChart"
-import { riceBox, chaumin } from "@/lib/menu-data"
+import { riceBox, chaumin, extras } from "@/lib/menu-data"
 
 export default async function AdminPage() {
   const jar = await cookies()
@@ -162,6 +162,7 @@ export default async function AdminPage() {
           {[
             { label: "Rice & Chip Box", items: riceBox },
             { label: "Chaumin Box",     items: chaumin },
+            { label: "Agregados",       items: extras },
           ].map(({ label, items }) => (
             <div key={label} className="space-y-2">
               <p className="text-white/25 text-[10px] uppercase tracking-widest" style={{ fontFamily: "var(--font-inter)" }}>
